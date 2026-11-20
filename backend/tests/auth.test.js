@@ -107,10 +107,14 @@ describe('Authentication, Cookies, CSRF & Security', () => {
   it('supports Continue with Google OAuth 2.0 redirect, CSRF state check, and account sign-in', async () => {
     const prevId = env.google.clientId;
     const prevSecret = env.google.clientSecret;
+    const prevEnvId = process.env.GOOGLE_CLIENT_ID;
+    const prevEnvSecret = process.env.GOOGLE_CLIENT_SECRET;
 
     try {
       env.google.clientId = '';
       env.google.clientSecret = '';
+      delete process.env.GOOGLE_CLIENT_ID;
+      delete process.env.GOOGLE_CLIENT_SECRET;
 
       const unconfiguredRes = await supertest(app).get('/api/auth/google');
       expect(unconfiguredRes.status).toBe(302);
@@ -118,6 +122,8 @@ describe('Authentication, Cookies, CSRF & Security', () => {
 
       env.google.clientId = 'test-google-client-id.apps.googleusercontent.com';
       env.google.clientSecret = 'test-google-client-secret';
+      process.env.GOOGLE_CLIENT_ID = env.google.clientId;
+      process.env.GOOGLE_CLIENT_SECRET = env.google.clientSecret;
 
       const oauthAgent = supertest.agent(app);
       const startRes = await oauthAgent.get('/api/auth/google');
@@ -166,6 +172,16 @@ describe('Authentication, Cookies, CSRF & Security', () => {
     } finally {
       env.google.clientId = prevId;
       env.google.clientSecret = prevSecret;
+      if (prevEnvId !== undefined) {
+        process.env.GOOGLE_CLIENT_ID = prevEnvId;
+      } else {
+        delete process.env.GOOGLE_CLIENT_ID;
+      }
+      if (prevEnvSecret !== undefined) {
+        process.env.GOOGLE_CLIENT_SECRET = prevEnvSecret;
+      } else {
+        delete process.env.GOOGLE_CLIENT_SECRET;
+      }
     }
   });
 });
