@@ -18,10 +18,11 @@ export function verifyAuthToken(token) {
 }
 
 export function getAuthCookieOptions() {
+  const sameSite = process.env.COOKIE_SAME_SITE || (env.isProd ? 'lax' : 'lax');
   return {
     httpOnly: true,
     secure: env.cookieSecure,
-    sameSite: env.isProd ? 'strict' : 'lax',
+    sameSite,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   };

@@ -31,7 +31,7 @@ export const env = {
   isProd,
   isTest,
   port: Number(process.env.PORT || 5000),
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  clientUrl: process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
   mongoUri: process.env.MONGO_URI || '',
   useMemoryDb: process.env.USE_MEMORY_DB === 'true',
   autoSeedDemo: process.env.AUTO_SEED_DEMO !== 'false',

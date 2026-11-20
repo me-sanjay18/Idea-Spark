@@ -1,3 +1,4 @@
+import fsSync from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';
@@ -31,13 +32,23 @@ export function createApp() {
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
+      contentSecurityPolicy: false,
     })
   );
 
   app.use(
     cors({
       origin(origin, callback) {
-        if (!origin || origin === env.clientUrl || (!env.isProd && /^http:\/\/localhost:\d+$/.test(origin))) {
+        const allowedOrigins = [
+          env.clientUrl,
+          process.env.RENDER_EXTERNAL_URL,
+        ].filter(Boolean);
+
+        if (
+          !origin ||
+          allowedOrigins.includes(origin) ||
+          (!env.isProd && /^http:\/\/localhost:\d+$/.test(origin))
+        ) {
           return callback(null, true);
         }
         return callback(new Error('Origin not permitted by CORS policy'));
@@ -67,16 +78,6 @@ export function createApp() {
     express.static(path.resolve(__dirname, '../uploads'))
   );
 
-  app.get('/', (_req, res) => {
-    res.status(200).json({
-      success: true,
-      service: 'IdeaSpark API Server',
-      message: 'Backend API is running. Open the Frontend UI at http://localhost:5173',
-      frontendUrl: env.clientUrl,
-      healthEndpoint: '/api/health',
-    });
-  });
-
   app.get('/api/health', (_req, res) => {
     res.status(200).json({
       success: true,
@@ -97,6 +98,28 @@ export function createApp() {
   app.use('/api/bookmarks', bookmarkRoutes);
   app.use('/api/reports', reportRoutes);
   app.use('/api/admin', adminRoutes);
+
+  // Serve frontend build if present (Production full-stack single service deploy on Render)
+  const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+  if (fsSync.existsSync(frontendDistPath)) {
+    app.use(express.static(frontendDistPath));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+        return next();
+      }
+      return res.sendFile(path.join(frontendDistPath, 'index.html'));
+    });
+  } else {
+    app.get('/', (_req, res) => {
+      res.status(200).json({
+        success: true,
+        service: 'IdeaSpark API Server',
+        message: 'Backend API is running. Open the Frontend UI at http://localhost:5173',
+        frontendUrl: env.clientUrl,
+        healthEndpoint: '/api/health',
+      });
+    });
+  }
 
   app.use(notFoundHandler);
   app.use(errorHandler);
