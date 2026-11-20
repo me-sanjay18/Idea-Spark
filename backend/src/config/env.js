@@ -54,14 +54,14 @@ export const env = {
     clientId: cleanEnvValue(process.env.GITHUB_CLIENT_ID),
     clientSecret: cleanEnvValue(process.env.GITHUB_CLIENT_SECRET),
     callbackUrl: cleanEnvValue(
-      process.env.GITHUB_CALLBACK_URL || 'http://localhost:5000/api/auth/github/callback'
+      process.env.GITHUB_CALLBACK_URL || `${clientUrl}/api/auth/github/callback`
     ),
   },
   google: {
     clientId: cleanEnvValue(process.env.GOOGLE_CLIENT_ID),
     clientSecret: cleanEnvValue(process.env.GOOGLE_CLIENT_SECRET),
     callbackUrl: cleanEnvValue(
-      process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'
+      process.env.GOOGLE_CALLBACK_URL || `${clientUrl}/api/auth/google/callback`
     ),
   },
   ai: {
