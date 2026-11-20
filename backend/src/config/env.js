@@ -15,29 +15,27 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 const isProd = nodeEnv === 'production';
 const isTest = nodeEnv === 'test';
 
-if (isProd) {
-  const requiredInProd = ['MONGO_URI', 'JWT_SECRET', 'CSRF_SECRET', 'CLIENT_URL'];
-  const missing = requiredInProd.filter((key) => !process.env[key]);
-  if (missing.length > 0) {
-    throw new Error(`Missing required production environment variables: ${missing.join(', ')}`);
-  }
-}
-
+const defaultMongoUri = '';
 const devJwtFallback = crypto.createHash('sha256').update(`ideaspark-dev-jwt-${process.cwd()}`).digest('hex');
 const devCsrfFallback = crypto.createHash('sha256').update(`ideaspark-dev-csrf-${process.cwd()}`).digest('hex');
+
+const mongoUri = cleanEnvValue(process.env.MONGO_URI) || defaultMongoUri;
+const clientUrl = cleanEnvValue(process.env.CLIENT_URL) || cleanEnvValue(process.env.RENDER_EXTERNAL_URL) || 'http://localhost:5173';
+const jwtSecret = cleanEnvValue(process.env.JWT_SECRET) || devJwtFallback;
+const csrfSecret = cleanEnvValue(process.env.CSRF_SECRET) || devCsrfFallback;
 
 export const env = {
   nodeEnv,
   isProd,
   isTest,
   port: Number(process.env.PORT || 5000),
-  clientUrl: process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
-  mongoUri: process.env.MONGO_URI || '',
+  clientUrl,
+  mongoUri,
   useMemoryDb: process.env.USE_MEMORY_DB === 'true',
   autoSeedDemo: process.env.AUTO_SEED_DEMO !== 'false',
-  jwtSecret: process.env.JWT_SECRET || devJwtFallback,
+  jwtSecret,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
-  csrfSecret: process.env.CSRF_SECRET || devCsrfFallback,
+  csrfSecret,
   cookieSecure: isProd ? true : process.env.COOKIE_SECURE === 'true',
   smtp: {
     host: process.env.SMTP_HOST || '',
