@@ -20,7 +20,8 @@ const devJwtFallback = crypto.createHash('sha256').update(`ideaspark-dev-jwt-${p
 const devCsrfFallback = crypto.createHash('sha256').update(`ideaspark-dev-csrf-${process.cwd()}`).digest('hex');
 
 const mongoUri = cleanEnvValue(process.env.MONGO_URI) || defaultMongoUri;
-const clientUrl = cleanEnvValue(process.env.CLIENT_URL) || cleanEnvValue(process.env.RENDER_EXTERNAL_URL) || 'http://localhost:5173';
+const defaultClientUrl = isProd ? 'https://ideaspark-pfwq.onrender.com' : 'http://localhost:5173';
+const clientUrl = cleanEnvValue(process.env.CLIENT_URL) || cleanEnvValue(process.env.RENDER_EXTERNAL_URL) || defaultClientUrl;
 const jwtSecret = cleanEnvValue(process.env.JWT_SECRET) || devJwtFallback;
 const csrfSecret = cleanEnvValue(process.env.CSRF_SECRET) || devCsrfFallback;
 
@@ -93,12 +94,12 @@ export function refreshOAuthEnv() {
   env.github.clientId = cleanEnvValue(process.env.GITHUB_CLIENT_ID);
   env.github.clientSecret = cleanEnvValue(process.env.GITHUB_CLIENT_SECRET);
   env.github.callbackUrl = cleanEnvValue(
-    process.env.GITHUB_CALLBACK_URL || 'http://localhost:5000/api/auth/github/callback'
+    process.env.GITHUB_CALLBACK_URL || `${env.clientUrl}/api/auth/github/callback`
   );
   env.google.clientId = cleanEnvValue(process.env.GOOGLE_CLIENT_ID);
   env.google.clientSecret = cleanEnvValue(process.env.GOOGLE_CLIENT_SECRET);
   env.google.callbackUrl = cleanEnvValue(
-    process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'
+    process.env.GOOGLE_CALLBACK_URL || `${env.clientUrl}/api/auth/google/callback`
   );
   return env;
 }
