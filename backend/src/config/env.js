@@ -102,6 +102,9 @@ export function refreshDbEnv() {
   if (currentEnv) process.env.NODE_ENV = currentEnv;
   env.mongoUri = cleanEnvValue(process.env.MONGO_URI);
   env.useMemoryDb = cleanEnvValue(process.env.USE_MEMORY_DB) === 'true';
+  if (!env.mongoUri && !env.useMemoryDb) {
+    throw new Error('MONGO_URI is required to connect to MongoDB.');
+  }
   env.autoSeedDemo = cleanEnvValue(process.env.AUTO_SEED_DEMO) !== 'false';
   return env;
 }
