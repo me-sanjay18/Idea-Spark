@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #6E05F2;
+  --color-brand-secondary: #2057E8;
+  --color-brand-accent: #CD2BE2;
+  --color-brand-bg: #F8F9FC;
+  --color-brand-text: #171717;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    background-color: #F8F9FC;
+    color: #171717;
+  }
+
+  button:not(:disabled),
+  a[href] {
+    cursor: pointer;
+  }
+}
+
+.brand-gradient-text {
+  background: linear-gradient(135deg, #6E05F2 0%, #2057E8 60%, #CD2BE2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-gradient-bg {
+  background: linear-gradient(135deg, #6E05F2 0%, #2057E8 100%);
+}
+
